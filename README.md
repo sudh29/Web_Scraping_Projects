@@ -46,3 +46,42 @@ It's essential to use web scraping responsibly and ethically. Always respect web
 - [Scrapy Documentation](https://docs.scrapy.org/en/latest/)
 - [Selenium Documentation](https://www.selenium.dev/documentation/en/)
 - [Python.org](https://www.python.org/) - Official website for Python programming language.
+
+## Setup Instructions
+
+### 1. Install `uv` (Python package manager)
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+### 2. Create and initialize a virtual environment
+
+```bash
+uv venv
+uv init
+```
+
+### 3. Activate the virtual environment
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install project dependencies
+
+```bash
+uv pip install -r requirements.txt
+```
+
+Or, to sync with `pyproject.toml`:
+
+```bash
+uv sync
+```
+
+### 5. (Optional) Freeze current dependencies
+
+```bash
+uv pip freeze > requirements.txt
+```
