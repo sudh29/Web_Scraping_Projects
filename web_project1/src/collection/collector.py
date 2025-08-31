@@ -7,9 +7,14 @@ from datetime import datetime, timedelta, timezone
 import pandas as pd
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
 
-def generate_mock_tweets(hashtags: list[str], since_date: str, limit: int) -> pd.DataFrame:
+
+def generate_mock_tweets(
+    hashtags: list[str], since_date: str, limit: int
+) -> pd.DataFrame:
     """
     Generates a DataFrame of mock tweets.
 
@@ -21,45 +26,54 @@ def generate_mock_tweets(hashtags: list[str], since_date: str, limit: int) -> pd
     Returns:
         A pandas DataFrame containing the mock tweets.
     """
-    logging.info("Generating mock tweet data due to issues with Twitter scraping libraries.")
+    logging.info(
+        "Generating mock tweet data due to issues with Twitter scraping libraries."
+    )
 
     tweets = []
-    start_date_obj = datetime.strptime(since_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+    start_date_obj = datetime.strptime(since_date, "%Y-%m-%d").replace(
+        tzinfo=timezone.utc
+    )
 
-    positive_words = ['buy', 'bullish', 'profit', 'up', 'high', 'rally']
-    negative_words = ['sell', 'bearish', 'loss', 'down', 'low', 'crash']
+    positive_words = ["buy", "bullish", "profit", "up", "high", "rally"]
+    negative_words = ["sell", "bearish", "loss", "down", "low", "crash"]
 
     for i in range(limit):
-        timestamp = start_date_obj + timedelta(hours=random.randint(0, 23), minutes=random.randint(0, 59))
+        timestamp = start_date_obj + timedelta(
+            hours=random.randint(0, 23), minutes=random.randint(0, 59)
+        )
         hashtag = random.choice(hashtags)
 
-        sentiment_type = random.choice(['positive', 'negative', 'neutral'])
-        if sentiment_type == 'positive':
+        sentiment_type = random.choice(["positive", "negative", "neutral"])
+        if sentiment_type == "positive":
             extra_word = random.choice(positive_words)
-            content = f'This is a mock tweet about {hashtag}. I am feeling very {extra_word} about this! #stockmarket #{hashtag.strip("#")}'
-        elif sentiment_type == 'negative':
+            content = f"This is a mock tweet about {hashtag}. I am feeling very {extra_word} about this! #stockmarket #{hashtag.strip('#')}"
+        elif sentiment_type == "negative":
             extra_word = random.choice(negative_words)
-            content = f'This is a mock tweet about {hashtag}. I am feeling very {extra_word} about this! #stockmarket #{hashtag.strip("#")}'
+            content = f"This is a mock tweet about {hashtag}. I am feeling very {extra_word} about this! #stockmarket #{hashtag.strip('#')}"
         else:
-            content = f'This is a mock tweet about {hashtag}. #stockmarket #{hashtag.strip("#")}'
+            content = f"This is a mock tweet about {hashtag}. #stockmarket #{hashtag.strip('#')}"
 
-        tweets.append({
-            'username': f'user_{random.randint(1, 1000)}',
-            'timestamp': timestamp,
-            'content': content,
-            'likes': random.randint(0, 1000),
-            'retweets': random.randint(0, 500),
-            'replies': random.randint(0, 100),
-            'quotes': random.randint(0, 50),
-            'hashtags': ['stockmarket', hashtag.strip('#')],
-            'mentions': [f'expert_{random.randint(1,10)}']
-        })
+        tweets.append(
+            {
+                "username": f"user_{random.randint(1, 1000)}",
+                "timestamp": timestamp,
+                "content": content,
+                "likes": random.randint(0, 1000),
+                "retweets": random.randint(0, 500),
+                "replies": random.randint(0, 100),
+                "quotes": random.randint(0, 50),
+                "hashtags": ["stockmarket", hashtag.strip("#")],
+                "mentions": [f"expert_{random.randint(1, 10)}"],
+            }
+        )
 
     df = pd.DataFrame(tweets)
     logging.info(f"Successfully generated {len(df)} mock tweets.")
     return df
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Example usage
     hashtags_to_scrape = ["#nifty50", "#sensex", "#intraday", "#banknifty"]
     start_date = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")

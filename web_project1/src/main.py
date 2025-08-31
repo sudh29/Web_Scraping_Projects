@@ -5,10 +5,16 @@ from datetime import datetime, timedelta, timezone
 
 from collection.collector import generate_mock_tweets
 from processing.processor import process_tweets, save_to_parquet
-from analysis.analyzer import perform_sentiment_analysis, visualize_sentiment_distribution
+from analysis.analyzer import (
+    perform_sentiment_analysis,
+    visualize_sentiment_distribution,
+)
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 def main():
     """Main function to run the data pipeline."""
@@ -45,9 +51,11 @@ def main():
 
     logging.info("Pipeline finished successfully.")
 
+
 if __name__ == "__main__":
     # Create data directory if it doesn't exist
     import os
+
     if not os.path.exists("data"):
         os.makedirs("data")
 

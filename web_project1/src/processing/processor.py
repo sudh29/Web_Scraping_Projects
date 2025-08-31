@@ -4,7 +4,10 @@ import logging
 import pandas as pd
 
 # Setup logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
+)
+
 
 def process_tweets(df: pd.DataFrame) -> pd.DataFrame:
     """
@@ -21,23 +24,24 @@ def process_tweets(df: pd.DataFrame) -> pd.DataFrame:
         return df
 
     # 1. Handle duplicates
-    df.drop_duplicates(subset=['content', 'username', 'timestamp'], inplace=True)
+    df.drop_duplicates(subset=["content", "username", "timestamp"], inplace=True)
     logging.info(f"Removed duplicates, {len(df)} tweets remaining.")
 
     # 2. Handle missing values (though mock data is clean)
-    df.fillna({'content': ''}, inplace=True)
+    df.fillna({"content": ""}, inplace=True)
 
     # 3. Normalize text: lowercase
-    df['content'] = df['content'].str.lower()
+    df["content"] = df["content"].str.lower()
 
     # 4. Convert timestamp to datetime objects
-    df['timestamp'] = pd.to_datetime(df['timestamp'])
+    df["timestamp"] = pd.to_datetime(df["timestamp"])
 
     # 5. Handle unicode (though less relevant for mock data)
-    df['content'] = df['content'].str.encode('ascii', 'ignore').str.decode('ascii')
+    df["content"] = df["content"].str.encode("ascii", "ignore").str.decode("ascii")
 
     logging.info("Successfully processed tweets.")
     return df
+
 
 def save_to_parquet(df: pd.DataFrame, filepath: str):
     """
@@ -53,7 +57,8 @@ def save_to_parquet(df: pd.DataFrame, filepath: str):
     except Exception as e:
         logging.error(f"Failed to save data to Parquet file: {e}")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Example usage with mock data
     # In a real pipeline, this would be integrated with the collector
     from datetime import datetime, timedelta, timezone
@@ -61,7 +66,7 @@ if __name__ == '__main__':
 
     hashtags = ["#nifty50", "#sensex", "#intraday", "#banknifty"]
     since = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
-    limit = 2500 # Generate more to test deduplication
+    limit = 2500  # Generate more to test deduplication
 
     mock_df = generate_mock_tweets(hashtags, since, limit)
     processed_df = process_tweets(mock_df)
