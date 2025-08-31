@@ -1,76 +1,52 @@
-"""Data processing module for cleaning and normalizing tweet data."""
-
 import logging
 import pandas as pd
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+class DataProcessor:
+    """A class to process tweet data."""
 
-def process_tweets(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Cleans and normalizes a DataFrame of tweets.
+    def __init__(self, df: pd.DataFrame):
+        """
+        Initializes the DataProcessor.
+        Args:
+            df: A pandas DataFrame containing tweet data.
+        """
+        self.df = df
 
-    Args:
-        df: A pandas DataFrame containing the tweet data.
+    def process_tweets(self) -> pd.DataFrame:
+        """
+        Cleans and normalizes the DataFrame of tweets.
+        Returns:
+            A pandas DataFrame with cleaned and normalized data.
+        """
+        if self.df.empty:
+            logging.warning("Input DataFrame is empty. No processing will be done.")
+            return self.df
 
-    Returns:
-        A pandas DataFrame with cleaned and normalized data.
-    """
-    if df.empty:
-        logging.warning("Input DataFrame is empty. No processing will be done.")
-        return df
+        # Handle duplicates and missing values
+        self.df.drop_duplicates(subset=["content", "username", "timestamp"], inplace=True)
+        self.df.fillna({"content": ""}, inplace=True)
 
-    # 1. Handle duplicates
-    df.drop_duplicates(subset=["content", "username", "timestamp"], inplace=True)
-    logging.info(f"Removed duplicates, {len(df)} tweets remaining.")
+        # Normalize text and convert timestamp
+        self.df["content"] = self.df["content"].str.lower()
+        self.df["timestamp"] = pd.to_datetime(self.df["timestamp"])
+        self.df["content"] = self.df["content"].str.encode("ascii", "ignore").str.decode("ascii")
 
-    # 2. Handle missing values (though mock data is clean)
-    df.fillna({"content": ""}, inplace=True)
+        logging.info(f"Processed {len(self.df)} tweets.")
+        return self.df
 
-    # 3. Normalize text: lowercase
-    df["content"] = df["content"].str.lower()
+    def save_to_parquet(self, filepath: str):
+        """
+        Saves the DataFrame to a Parquet file.
+        Args:
+            filepath: The path to the output Parquet file.
+        """
+        try:
+            self.df.to_parquet(filepath, index=False)
+            logging.info(f"Data saved to {filepath}")
+        except Exception as e:
+            logging.error(f"Failed to save data to Parquet: {e}")
 
-    # 4. Convert timestamp to datetime objects
-    df["timestamp"] = pd.to_datetime(df["timestamp"])
-
-    # 5. Handle unicode (though less relevant for mock data)
-    df["content"] = df["content"].str.encode("ascii", "ignore").str.decode("ascii")
-
-    logging.info("Successfully processed tweets.")
-    return df
-
-
-def save_to_parquet(df: pd.DataFrame, filepath: str):
-    """
-    Saves a DataFrame to a Parquet file.
-
-    Args:
-        df: The DataFrame to save.
-        filepath: The path to the output Parquet file.
-    """
-    try:
-        df.to_parquet(filepath, index=False)
-        logging.info(f"Successfully saved data to {filepath}")
-    except Exception as e:
-        logging.error(f"Failed to save data to Parquet file: {e}")
-
-
-if __name__ == "__main__":
-    # Example usage with mock data
-    # In a real pipeline, this would be integrated with the collector
-    from datetime import datetime, timedelta, timezone
-    from web_project1.src.collection.collector import generate_mock_tweets
-
-    hashtags = ["#nifty50", "#sensex", "#intraday", "#banknifty"]
-    since = (datetime.now(timezone.utc) - timedelta(days=1)).strftime("%Y-%m-%d")
-    limit = 2500  # Generate more to test deduplication
-
-    mock_df = generate_mock_tweets(hashtags, since, limit)
-    processed_df = process_tweets(mock_df)
-
-    if not processed_df.empty:
-        print(processed_df.head())
-        save_to_parquet(processed_df, "processed_tweets.parquet")
