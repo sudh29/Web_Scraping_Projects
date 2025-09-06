@@ -85,3 +85,5 @@ uv sync
 ```bash
 uv pip freeze > requirements.txt
 ```
+
+uv venv --python 3.11
